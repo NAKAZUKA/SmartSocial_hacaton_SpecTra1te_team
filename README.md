@@ -1,7 +1,7 @@
 # SmartSocial_hacaton_SpecTra1te_team
 
 Этот проект включает три основных компонента:
-1. Бот для Telegram (`bot_museum-main`) ([museum_spectra1te_bot](https://t.me/museum_spectra1te_bot)) (`bot_museum-main`)
+1. Бот для Telegram (`bot_museum-main`) ([museum_spectra1te_bot](https://t.me/museum_spectra1te_bot))
 2. Сервис управления данными музея с API и админ-панелью (`museum_admin_drf-main`)
 3. Сервис аудиогида с GPS системой (`WOLK-speaker`)
 
