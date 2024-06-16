@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>GPS</title>
+    <style>
+        /*video::-webkit-media-controls {
+    display: none; // Стандартные элементы управления отключены.
+  }*/
+        html, body, * {
+            margin: 0;
+
+            padding: 0;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        body {
+            background-color: #17212B;
+        }
+        p {
+        font-family: "Lato", Calibri, Arial, sans-serif;
+        font-size: 125%;
+            color: white;
+            min-width: 100vw;
+            text-align: center;
+        }
+
+        #map {
+            width: 100vw; height: 50vh; padding: 0; margin: 0;
+        }
+    </style>
+</head>
+<body>
+<!--<audio id="audio" controls src="/static/about_museum.mp3"></audio>-->
+    <p id="title"></p>
+    <p id="comment"></p>
+<!--    <p id="text"></p>-->
+<video autoplay="autoplay" controls="false" muted="muted" id="video" width="100vw" style="min-width:100vw"><!-- poster="video/duel.jpg">-->
+   <source src="static/total_fon.mp4" type='video/mp4'>
+</video>
+<div id="map"></div>
+
+
+
+
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=c8067ced-e27c-470c-8131-917d5f996536" type="text/javascript"></script>
+<script src="https://yandex.st/jquery/2.2.3/jquery.min.js" type="text/javascript"></script>
+<script>
+ymaps.ready(function () {
+    var map;
+    ymaps.geolocation.get().then(function (res) {
+        var mapContainer = $('#map'),
+            bounds = res.geoObjects.get(0).properties.get('boundedBy'),
+            // Рассчитываем видимую область для текущей положения пользователя.
+            mapState = ymaps.util.bounds.getCenterAndZoom(
+                bounds,
+                [mapContainer.width(), mapContainer.height()]
+            );
+        createMap(mapState);
+    }, function (e) {
+        // Если местоположение невозможно получить, то просто создаем карту.
+        createMap({
+            center: [55.751574, 37.573856],
+            zoom: 2
+        });
+    });
+
+    function createMap (state) {
+        map = new ymaps.Map('map', state);
+    }
+});
+</script>
+
+</body>
+</html>
+
+<script>
+    var rtt = navigator.geolocation;
+    var last = "total_fon";
+    function GPS(){
+        rtt.watchPosition(function(location){
+            /*console.log(location.coords.latitude);
+            console.log(location.coords.longitude);
+            console.log(location.coords.accuracy);
+
+            document.getElementById("text").innerHTML = "(" + Math.random() + ")<br><br>" + location.coords.latitude + ", " + location.coords.longitude;
+            */
+            const url='/gps';
+            const user = {
+                "latitude": location.coords.latitude,
+                "longitude": location.coords.longitude,
+                "accuracy": location.coords.accuracy,
+                "nik": "{{ data.nik }}"
+            };
+            const otherParam = {
+              headers: {
+                "content-type": "application/json; charset=UTF-8",
+              },
+              body: JSON.stringify(user),
+              method: "POST",
+            };
+
+
+
+            fetch(url, otherParam)
+                .then(function(response){ return response.json(); })
+                .then(function(response){
+
+                 /*var r = document.getElementById("text").innerHTML;
+                 r = r + "<br><br>" + JSON.stringify(response);
+                 document.getElementById("text").innerHTML = r;*/
+
+                document.getElementById("title").innerHTML = '';
+                /*document.getElementById("comment").innerHTML = '';*/
+                document.getElementById("title").innerHTML += "<br>" + response[0]["name"];
+                 /*for (var i = 0; i < response.length; i++){
+                     document.getElementById("title").innerHTML += "<br>" + response[i]["name"];
+                     if (String(response[i]["comment"]) != "null") document.getElementById("comment").innerHTML += "<br>" + response[i]["comment"];
+                 };*/
+
+                 if (last != response[0]["media"]){
+                     document.getElementById("video").setAttribute("src", "static/" + response[0]["media"] + ".mp4");
+                     document.getElementById("video").muted = false;
+                     document.getElementById("video").play();
+
+                     last = response[0]["media"];
+                 }
+                 })
+                .catch(error => console.log(error));
+
+        });
+    };
+
+    setInterval(function(){GPS()},5000);
+
+</script>
