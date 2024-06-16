@@ -1,0 +1,1 @@
+# SmartSocial_hacaton_SpecTra1te_team
